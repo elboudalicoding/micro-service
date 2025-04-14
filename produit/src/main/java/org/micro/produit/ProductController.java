@@ -8,39 +8,24 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("api/v1/products")
-public record ProductController(ProductService productService) {
+@RequestMapping("/api/products")
+public class ProductController {
 
-    @PostMapping
-    public ResponseEntity<Product>  createProduct(@RequestBody ProductRequest productRequest) {
-        log.info("new product registration {}", productRequest);
-        Product newProduct = productService.createProduct(productRequest);
-        return ResponseEntity.status(201).body(newProduct);
-    }
+    private final ProductService productService;
 
-    @GetMapping
-    public List<Product> getProduct(){
-        log.info("get all products");
-        return productService.getAllProducts();
+    public ProductController(ProductService productService) {
+        this.productService = productService;
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getProductById(@PathVariable Integer id) {
+    public ResponseEntity<Product> getProductById(@PathVariable("id") Integer id) {
         return productService.getProductById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Product> updateProduct(@PathVariable Integer id, @RequestBody ProductRequest productRequest) {
-        return ResponseEntity.ok(productService.updateProduct(id, productRequest));
+    @GetMapping
+    public List<Product> getAll() {
+        return productService.getAllProducts();
     }
-
-    // Delete a product by ID
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable Integer id) {
-        productService.deleteProduct(id);
-        return ResponseEntity.noContent().build();
-    }
-
 }
